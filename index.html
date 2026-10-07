@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Έσοδα – Έξοδα</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+  body {
+    background: #0f1419;
+    background-image:
+      radial-gradient(circle at 15% 15%, rgba(0, 212, 170, 0.08) 0%, transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(255, 90, 95, 0.08) 0%, transparent 45%);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    color: #e6edf3;
+  }
+
+  .dashboard {
+    max-width: 1300px;
+    width: 100%;
+    background: #161b22;
+    border-radius: 32px;
+    padding: 2.5rem 2.5rem 2rem 2.5rem;
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset;
+    border: 1px solid #21262d;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  h1::before {
+    content: '';
+    width: 6px;
+    height: 32px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #00d4aa, #ff5a5f);
+  }
+
+  .top-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .controls-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .controls-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .lang-switch {
+    display: flex;
+    background: #1c2128;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .lang-switch button {
+    background: transparent;
+    border: none;
+    color: #7d8590;
+    padding: 0.45rem 0.9rem;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .lang-switch button.active { background: #30363d; color: #00d4aa; }
+  .lang-switch button:hover:not(.active) { color: #c9d1d9; }
+
+  .btn-how, .btn-restore {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #1c2128;
+    border: 1px solid #30363d;
+    color: #7d8590;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-how:hover { color: #00d4aa; border-color: #00d4aa; background: rgba(0,212,170,0.06); }
+  .btn-restore:hover { color: #f4a261; border-color: #f4a261; background: rgba(244,162,97,0.06); }
+
+  .autosave-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    background: #1c2128;
+    border: 1px solid #30363d;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    font-size: 0.85rem;
+    color: #7d8590;
+    font-weight: 600;
+  }
+  .autosave-toggle:hover { border-color: #444c56; color: #c9d1d9; }
+  .autosave-toggle.active { color: #00d4aa; border-color: rgba(0, 212, 170, 0.4); background: rgba(0, 212, 170, 0.06); }
+
+  .switch-track {
+    width: 36px; height: 20px;
+    background: #30363d;
+    border-radius: 20px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .switch-track::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 16px; height: 16px;
+    background: #7d8590;
+    border-radius: 50%;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .autosave-toggle.active .switch-track { background: rgba(0, 212, 170, 0.3); }
+  .autosave-toggle.active .switch-track::after {
+    left: 18px;
+    background: #00d4aa;
+    box-shadow: 0 0 8px rgba(0, 212, 170, 0.6);
+  }
+
+  .save-notice {
+    position: fixed;
+    top: 20px; right: 20px;
+    background: #1c2128;
+    border: 1px solid rgba(0, 212, 170, 0.4);
+    color: #00d4aa;
+    padding: 0.8rem 1.2rem;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+    z-index: 200;
+    max-width: 90vw;
+  }
+  .save-notice.show { opacity: 1; transform: translateY(0); }
+  .save-notice.warn { border-color: rgba(244,162,97,0.5); color: #f4a261; }
+  .save-notice.err { border-color: rgba(255,90,95,0.5); color: #ff5a5f; }
+
+  .subhead {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    color: #7d8590;
+    font-size: 0.95rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #21262d;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .subhead .dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: #00d4aa;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00d4aa;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ΚΑΡΤΑ ΕΤΟΥΣ */
+  .year-card {
+    background: linear-gradient(135deg, #1a2b3d 0%, #0d1a26 100%);
+    border: 1px solid rgba(0, 212, 170, 0.2);
+    border-radius: 24px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .year-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,212,170,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .year-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 1;
+  }
+  .year-label .title {
+    color: #7ee7d0;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .year-selector-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .year-selector {
+    background: rgba(0,0,0,0.3);
+    color: #ffffff;
+    border: 1.5px solid rgba(0, 212, 170, 0.3);
+    border-radius: 12px;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+    min-width: 130px;
+    appearance: none;
+    font-family: inherit;
+    letter-spacing: -0.02em;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%2300d4aa%22%20d%3D%22M6%208L2%204h8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+  }
+  .year-selector:hover { border-color: #00d4aa; background-color: rgba(0,0,0,0.4); }
+  .year-selector:focus {
+    border-color: #00d4aa;
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
+  }
+  .year-selector option { background: #161b22; color: #e6edf3; font-size: 1rem; }
+
+  .btn-all-years {
+    background: transparent;
+    border: 1.5px solid rgba(0, 212, 170, 0.3);
+    color: #7ee7d0;
+    padding: 0.55rem 0.9rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .btn-all-years:hover {
+    background: rgba(0, 212, 170, 0.1);
+    border-color: #00d4aa;
+    color: #00d4aa;
+  }
+
+  .year-stats {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+  .year-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .year-stat .y-label {
+    color: #7d8590;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  .year-stat .y-value {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+  }
+  .year-stat.income .y-value { color: #00d4aa; }
+  .year-stat.expense .y-value { color: #ff5a5f; }
+  .year-stat.balance .y-value {
+    background: linear-gradient(135deg, #00d4aa, #7ee7d0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .year-stat.balance.negative .y-value {
+    background: linear-gradient(135deg, #ff5a5f, #ff8f92);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .year-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.1); }
+
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .today-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(0, 212, 170, 0.08);
+    border: 1px solid rgba(0, 212, 170, 0.25);
+    color: #00d4aa;
+    padding: 0.7rem 1.2rem;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .month-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #1c2128;
+    border: 1px solid #30363d;
+    padding: 0.4rem;
+    border-radius: 16px;
+  }
+  .month-selector button {
+    background: transparent;
+    border: none;
+    color: #7d8590;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .month-selector button:hover { background: #30363d; color: #00d4aa; }
+
+  .month-selector select {
+    background: #0d1117;
+    color: #e6edf3;
+    border: 1.5px solid #30363d;
+    border-radius: 10px;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+    min-width: 210px;
+    appearance: none;
+    font-family: inherit;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%2300d4aa%22%20d%3D%22M6%208L2%204h8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+  }
+  .month-selector select:focus { border-color: #00d4aa; box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15); }
+  .month-selector select option { background: #0d1117; color: #e6edf3; }
+
+  .btn-today {
+    background: transparent;
+    border: 1px solid #30363d;
+    color: #7d8590;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: inherit;
+  }
+  .btn-today:hover { color: #00d4aa; border-color: #00d4aa; background: rgba(0,212,170,0.08); }
+
+  .grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card {
+    background: #1c2128;
+    border-radius: 24px;
+    padding: 1.8rem;
+    border: 1px solid #30363d;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #444c56; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .card-header h2 { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.01em; }
+  .income-header h2 { color: #00d4aa; }
+  .expense-header h2 { color: #ff5a5f; }
+
+  .income-header .icon {
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0, 212, 170, 0.12);
+    color: #00d4aa;
+    border-radius: 12px;
+    font-size: 1.2rem;
+  }
+  .expense-header .icon {
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255, 90, 95, 0.12);
+    color: #ff5a5f;
+    border-radius: 12px;
+    font-size: 1.2rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr auto auto auto;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid #21262d;
+  }
+
+  .form-row input,
+  .form-row select {
+    border: 1.5px solid #30363d;
+    background: #0d1117;
+    border-radius: 12px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.95rem;
+    color: #e6edf3;
+    font-weight: 500;
+    outline: none;
+    width: 100%;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .form-row input::placeholder { color: #484f58; font-weight: 400; }
+  .form-row input:focus, .form-row select:focus {
+    border-color: #00d4aa;
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
+  }
+  #expenseCategory:focus, #expenseAmount:focus {
+    border-color: #ff5a5f;
+    box-shadow: 0 0 0 3px rgba(255, 90, 95, 0.15);
+  }
+
+  .form-row select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%23888%22%20d%3D%22M6%208L2%204h8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    padding-right: 2rem;
+    cursor: pointer;
+    text-overflow: ellipsis;
+  }
+  .form-row select option { background: #0d1117; color: #e6edf3; padding: 0.5rem; }
+
+  .btn-add {
+    border: none;
+    cursor: pointer;
+    padding: 0.7rem 1.2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #0d1117;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .btn-add.income { background: #00d4aa; }
+  .btn-add.expense { background: #ff5a5f; color: #ffffff; }
+  .btn-add:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+  .btn-plus, .btn-del-cat {
+    border: 1.5px dashed #30363d;
+    background: transparent;
+    color: #7d8590;
+    width: 44px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+  }
+  .btn-plus:hover { color: #00d4aa; border-color: #00d4aa; background: rgba(0,212,170,0.06); }
+  #expenseCard .btn-plus:hover { color: #ff5a5f; border-color: #ff5a5f; background: rgba(255,90,95,0.06); }
+
+  .btn-del-cat { border-style: solid; border-color: #30363d; }
+  .btn-del-cat:hover { color: #ff5a5f; border-color: #ff5a5f; background: rgba(255,90,95,0.06); }
+  .btn-del-cat:disabled { opacity: 0.3; cursor: not-allowed; color: #484f58; border-color: #21262d; background: transparent; }
+
+  .list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 60px;
+    max-height: 380px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .list-items::-webkit-scrollbar { width: 6px; }
+  .list-items::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+
+  .empty-msg {
+    text-align: center;
+    color: #484f58;
+    padding: 1.5rem 0;
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  .list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 0.9rem;
+    background: #0d1117;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    animation: fadeIn 0.25s ease;
+    gap: 0.5rem;
+  }
+  .list-item:hover { border-color: #30363d; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .list-item .left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    overflow: hidden;
+    flex: 1;
+    min-width: 0;
+  }
+  .list-item .desc {
+    color: #c9d1d9;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .list-item .date {
+    color: #6e7681;
+    font-size: 0.78rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-left: 1rem;
+  }
+
+  .list-item .right {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-shrink: 0;
+  }
+  .list-item .amount { font-weight: 700; letter-spacing: -0.01em; font-size: 1rem; }
+  .income-amount { color: #00d4aa; }
+  .expense-amount { color: #ff5a5f; }
+
+  .btn-delete {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #484f58;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .btn-delete:hover { color: #ff5a5f; background: rgba(255,90,95,0.1); }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #21262d;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #7d8590;
+  }
+  .total-income { color: #00d4aa; font-size: 1.3rem; }
+  .total-expense { color: #ff5a5f; font-size: 1.3rem; }
+
+  .summary-card {
+    background: linear-gradient(135deg, #1c2128 0%, #0d1117 100%);
+    border-radius: 24px;
+    padding: 1.8rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #30363d;
+    gap: 1rem;
+  }
+  .summary-left h3 {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #7d8590;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+  .balance-number {
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #00d4aa, #7ee7d0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .balance-number.negative {
+    background: linear-gradient(135deg, #ff5a5f, #ff8f92);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .summary-right { display: flex; gap: 1.5rem; align-items: center; }
+  .summary-stat { text-align: center; }
+  .summary-stat .value { font-size: 1.4rem; font-weight: 700; color: #ffffff; display: block; }
+  .summary-stat .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #7d8590;
+    font-weight: 600;
+  }
+  .summary-stat.income .value { color: #00d4aa; }
+  .summary-stat.expense .value { color: #ff5a5f; }
+  .stat-divider { width: 1px; height: 36px; background: #30363d; }
+
+  .footer-note {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.2rem;
+    font-size: 0.85rem;
+    color: #484f58;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .btn-reset {
+    background: transparent;
+    border: 1px solid #30363d;
+    color: #7d8590;
+    padding: 0.45rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-reset:hover { color: #ff5a5f; border-color: #ff5a5f; background: rgba(255,90,95,0.08); }
+
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 1rem;
+  }
+  .modal-bg.active { display: flex; }
+  .modal {
+    background: #1c2128;
+    border: 1px solid #30363d;
+    border-radius: 24px;
+    padding: 2rem;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.8);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal h3 {
+    color: #ffffff;
+    font-size: 1.3rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .modal h3 i { color: #00d4aa; }
+  .modal p { color: #7d8590; font-size: 0.9rem; margin-bottom: 1.2rem; }
+  .modal input[type="text"] {
+    width: 100%;
+    border: 1.5px solid #30363d;
+    background: #0d1117;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    color: #e6edf3;
+    outline: none;
+    margin-bottom: 1.2rem;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .modal input[type="text"]:focus { border-color: #00d4aa; box-shadow: 0 0 0 3px rgba(0,212,170,0.15); }
+  .modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; flex-wrap: wrap; }
+  .modal-actions button {
+    border: none;
+    cursor: pointer;
+    padding: 0.7rem 1.3rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-cancel { background: transparent; border: 1px solid #30363d !important; color: #7d8590; }
+  .btn-cancel:hover { color: #e6edf3; border-color: #484f58 !important; }
+  .btn-save { background: #00d4aa; color: #0d1117; }
+  .btn-save:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-save.warn { background: #f4a261; }
+  .btn-save:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .restore-drop {
+    border: 2px dashed #30363d;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    background: #0d1117;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 1rem;
+  }
+  .restore-drop:hover, .restore-drop.dragover { border-color: #f4a261; background: rgba(244,162,97,0.04); }
+  .restore-drop i { font-size: 2rem; color: #f4a261; margin-bottom: 0.8rem; display: block; }
+  .restore-drop .main-text { color: #c9d1d9; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .restore-drop .sub-text { color: #7d8590; font-size: 0.82rem; }
+
+  .restore-preview {
+    background: rgba(0,212,170,0.06);
+    border: 1px solid rgba(0,212,170,0.25);
+    border-radius: 12px;
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 1rem;
+    font-size: 0.88rem;
+    color: #c9d1d9;
+    display: none;
+  }
+  .restore-preview.show { display: block; }
+  .restore-preview .row { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
+  .restore-preview .row:last-child { margin-bottom: 0; }
+  .restore-preview .key { color: #7d8590; }
+  .restore-preview .val { color: #7ee7d0; font-weight: 600; }
+
+  /* All-years modal */
+  .years-modal {
+    max-width: 520px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .years-modal::-webkit-scrollbar { width: 6px; }
+  .years-modal::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+  .years-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .year-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    color: inherit;
+    text-align: left;
+    width: 100%;
+  }
+  .year-item:hover {
+    border-color: #00d4aa;
+    background: rgba(0,212,170,0.04);
+  }
+  .year-item .yi-year {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .year-item .yi-number {
+    color: #ffffff;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .year-item .yi-count {
+    color: #7d8590;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  .year-item .yi-totals {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .year-item .yi-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    text-align: right;
+  }
+  .year-item .yi-label {
+    color: #7d8590;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+  }
+  .year-item .yi-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+  .year-item .yi-value.inc { color: #00d4aa; }
+  .year-item .yi-value.exp { color: #ff5a5f; }
+  .year-item .yi-value.bal {
+    background: linear-gradient(135deg, #00d4aa, #7ee7d0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .year-item .yi-value.bal.neg {
+    background: linear-gradient(135deg, #ff5a5f, #ff8f92);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .years-empty {
+    text-align: center;
+    color: #484f58;
+    font-style: italic;
+    padding: 2rem 0;
+  }
+
+  .how-modal {
+    max-width: 640px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 2rem 2rem 1.6rem 2rem;
+  }
+  .how-modal::-webkit-scrollbar { width: 6px; }
+  .how-modal::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+
+  .how-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.3rem;
+    flex-wrap: wrap;
+  }
+  .how-header h3 { margin-bottom: 0; }
+
+  .how-lang {
+    display: flex;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 2px;
+    gap: 2px;
+  }
+  .how-lang button {
+    background: transparent;
+    border: none;
+    color: #7d8590;
+    padding: 0.35rem 0.7rem;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .how-lang button.active { background: #30363d; color: #00d4aa; }
+  .how-lang button:hover:not(.active) { color: #c9d1d9; }
+
+  .how-body {
+    margin-top: 1.2rem;
+    color: #c9d1d9;
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+  .how-body h4 {
+    color: #00d4aa;
+    font-size: 1rem;
+    margin-top: 1.3rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .how-body h4:first-child { margin-top: 0; }
+  .how-body ul { list-style: none; padding-left: 0; }
+  .how-body li {
+    padding: 0.35rem 0 0.35rem 1.6rem;
+    position: relative;
+  }
+  .how-body li::before {
+    content: '\f111';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    left: 0.2rem;
+    top: 0.6rem;
+    font-size: 0.4rem;
+    color: #00d4aa;
+  }
+  .how-body strong { color: #ffffff; font-weight: 600; }
+  .how-body code {
+    background: #0d1117;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #7ee7d0;
+    font-family: 'SF Mono', Monaco, monospace;
+  }
+  .how-body .tip {
+    background: rgba(0, 212, 170, 0.08);
+    border-left: 3px solid #00d4aa;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #a0d8cc;
+  }
+
+  @media (max-width: 780px) {
+    .dashboard { padding: 1.5rem 1rem; border-radius: 24px; }
+    .grid-2col { grid-template-columns: 1fr; }
+    h1 { font-size: 1.6rem; }
+    .balance-number { font-size: 2rem; }
+    .form-row { grid-template-columns: 1fr 1fr; }
+    .btn-plus, .btn-del-cat { grid-column: span 1; width: 100%; height: 44px; }
+    .summary-card { flex-direction: column; align-items: flex-start; }
+    .summary-right { width: 100%; justify-content: space-around; }
+    .top-bar { flex-direction: column; align-items: stretch; }
+    .month-selector { justify-content: center; }
+    .month-selector select { min-width: 0; flex: 1; }
+    .today-badge { justify-content: center; }
+    .top-controls { flex-direction: column; align-items: stretch; }
+    .controls-right { justify-content: flex-start; }
+    .year-card { flex-direction: column; align-items: flex-start; }
+    .year-stats { width: 100%; justify-content: space-around; }
+    .year-divider { display: none; }
+    .year-selector { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="save-notice" id="saveNotice">
+  <i class="fas fa-download"></i>
+  <span id="saveNoticeText">Αποθήκευση αρχείου…</span>
+</div>
+
+<div class="dashboard">
+  <h1 id="pageTitle">Έσοδα – Έξοδα</h1>
+
+  <div class="top-controls">
+    <div class="controls-left">
+      <div class="lang-switch">
+        <button id="btnLangEl" class="active" onclick="setLang('el')">
+          <i class="fas fa-flag"></i> ΕΛ
+        </button>
+        <button id="btnLangEn" onclick="setLang('en')">
+          <i class="fas fa-flag-usa"></i> EN
+        </button>
+      </div>
+      <button class="btn-how" onclick="openHowModal()" id="btnHow">
+        <i class="fas fa-circle-question"></i>
+        <span id="btnHowText">Πώς λειτουργεί</span>
+      </button>
+    </div>
+
+    <div class="controls-right">
+      <button class="btn-restore" onclick="openRestoreModal()" id="btnRestore">
+        <i class="fas fa-upload"></i>
+        <span id="btnRestoreText">Επαναφορά</span>
+      </button>
+
+      <div class="autosave-toggle" id="autosaveToggle" onclick="toggleAutosave()">
+        <i class="fas fa-download"></i>
+        <span id="autosaveLabel">Auto-backup</span>
+        <div class="switch-track"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subhead">
+    <span><span class="dot"></span> <span id="autosaveStatus">Αυτόματη αποθήκευση</span></span>
+  </div>
+
+  <!-- ΚΑΡΤΑ ΕΤΟΥΣ -->
+  <div class="year-card">
+    <div class="year-label">
+      <span class="title"><i class="fas fa-calendar"></i> <span id="yearTitleLabel">Σύνολο Έτους</span></span>
+      <div class="year-selector-row">
+        <select class="year-selector" id="yearSelect" onchange="changeYear()"></select>
+        <button class="btn-all-years" onclick="openAllYearsModal()" id="btnAllYears">
+          <i class="fas fa-list"></i>
+          <span id="btnAllYearsText">Όλα τα έτη</span>
+        </button>
+      </div>
+    </div>
+    <div class="year-stats">
+      <div class="year-stat income">
+        <span class="y-label" id="yearIncomeLabel">Έσοδα</span>
+        <span class="y-value" id="yearIncome">€ 0,00</span>
+      </div>
+      <div class="year-divider"></div>
+      <div class="year-stat expense">
+        <span class="y-label" id="yearExpenseLabel">Έξοδα</span>
+        <span class="y-value" id="yearExpense">€ 0,00</span>
+      </div>
+      <div class="year-divider"></div>
+      <div class="year-stat balance" id="yearBalanceBox">
+        <span class="y-label" id="yearBalanceLabel">Υπόλοιπο</span>
+        <span class="y-value" id="yearBalance">€ 0,00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-bar">
+    <div class="today-badge">
+      <i class="fas fa-calendar-day"></i>
+      <span><span id="todayLabelPrefix">Σήμερα:</span> <strong id="todayLabel">—</strong></span>
+    </div>
+
+    <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+      <div class="month-selector">
+        <button onclick="prevMonth()" id="btnPrev" title="Προηγούμενος"><i class="fas fa-chevron-left"></i></button>
+        <select id="monthSelect" onchange="changeMonth()"></select>
+        <button onclick="nextMonth()" id="btnNext" title="Επόμενος"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <button class="btn-today" onclick="goToday()">
+        <i class="fas fa-crosshairs"></i> <span id="btnTodayText">Τρέχων μήνας</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="grid-2col">
+    <div class="card" id="incomeCard">
+      <div class="card-header income-header">
+        <h2 id="incomeTitle">Έσοδα</h2>
+        <div class="icon"><i class="fas fa-arrow-down"></i></div>
+      </div>
+
+      <div class="form-row">
+        <select id="incomeCategory"></select>
+        <input type="number" id="incomeAmount" placeholder="Ποσό €" step="0.01" min="0">
+        <button class="btn-add income" onclick="addItem('income')" title="Προσθήκη" id="btnAddIncome">
+          <i class="fas fa-plus"></i>
+        </button>
+        <button class="btn-plus" onclick="openAddCategory('income')" title="Νέα κατηγορία" id="btnNewIncomeCat">
+          <i class="fas fa-folder-plus"></i>
+        </button>
+        <button class="btn-del-cat" onclick="deleteCategory('income')" title="Διαγραφή κατηγορίας" id="btnDelIncomeCat">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+
+      <div class="list-items" id="incomeList"></div>
+
+      <div class="total-row">
+        <span id="totalIncomeLabel">Σύνολο Μήνα</span>
+        <span class="total-income" id="totalIncome">€ 0,00</span>
+      </div>
+    </div>
+
+    <div class="card" id="expenseCard">
+      <div class="card-header expense-header">
+        <h2 id="expenseTitle">Έξοδα</h2>
+        <div class="icon"><i class="fas fa-arrow-up"></i></div>
+      </div>
+
+      <div class="form-row">
+        <select id="expenseCategory"></select>
+        <input type="number" id="expenseAmount" placeholder="Ποσό €" step="0.01" min="0">
+        <button class="btn-add expense" onclick="addItem('expense')" title="Προσθήκη" id="btnAddExpense">
+          <i class="fas fa-plus"></i>
+        </button>
+        <button class="btn-plus" onclick="openAddCategory('expense')" title="Νέα κατηγορία" id="btnNewExpenseCat">
+          <i class="fas fa-folder-plus"></i>
+        </button>
+        <button class="btn-del-cat" onclick="deleteCategory('expense')" title="Διαγραφή κατηγορίας" id="btnDelExpenseCat">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+
+      <div class="list-items" id="expenseList"></div>
+
+      <div class="total-row">
+        <span id="totalExpenseLabel">Σύνολο Μήνα</span>
+        <span class="total-expense" id="totalExpense">€ 0,00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-card">
+    <div class="summary-left">
+      <h3 id="summaryTitle">Καθαρό Υπόλοιπο Μήνα</h3>
+      <div class="balance-number" id="balance">€ 0,00</div>
+    </div>
+    <div class="summary-right">
+      <div class="summary-stat income">
+        <span class="value" id="statIncome">0,00</span>
+        <span class="label" id="statIncomeLabel">Έσοδα</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="summary-stat expense">
+        <span class="value" id="statExpense">0,00</span>
+        <span class="label" id="statExpenseLabel">Έξοδα</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="summary-stat">
+        <span class="value" id="statSave">0%</span>
+        <span class="label" id="statSaveLabel">Αποταμίευση</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <span id="footerNote">Οι εγγραφές αποθηκεύονται τοπικά στον browser σου.</span>
+    <button class="btn-reset" onclick="resetAll()"><i class="fas fa-trash-alt"></i> <span id="btnResetText">Καθαρισμός όλων</span></button>
+  </div>
+</div>
+
+<!-- Modal: Νέα Κατηγορία -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3><i class="fas fa-folder-plus"></i> <span id="modalTitle">Νέα Κατηγορία</span></h3>
+    <p id="modalSubtitle">Προσθήκη νέας κατηγορίας εξόδων</p>
+    <input type="text" id="newCategoryInput" placeholder="Όνομα κατηγορίας" maxlength="30">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()" id="btnModalCancel">Άκυρο</button>
+      <button class="btn-save" onclick="saveNewCategory()" id="btnModalSave"><i class="fas fa-check"></i> Αποθήκευση</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Επαναφορά -->
+<div class="modal-bg" id="restoreModalBg">
+  <div class="modal">
+    <h3><i class="fas fa-upload"></i> <span id="restoreTitle">Επαναφορά από backup</span></h3>
+    <p id="restoreSubtitle">Επίλεξε ένα αρχείο JSON backup για να ανακτήσεις τα δεδομένα σου</p>
+
+    <div class="restore-drop" id="restoreDrop" onclick="document.getElementById('restoreFileInput').click()">
+      <i class="fas fa-file-import"></i>
+      <div class="main-text" id="restoreDropText">Κλικ για επιλογή αρχείου</div>
+      <div class="sub-text" id="restoreDropSub">ή σύρε και άφησε το αρχείο εδώ</div>
+      <input type="file" id="restoreFileInput" accept=".json,application/json" style="display:none">
+    </div>
+
+    <div class="restore-preview" id="restorePreview">
+      <div class="row">
+        <span class="key" id="rpFileLabel">Αρχείο:</span>
+        <span class="val" id="rpFileName">—</span>
+      </div>
+      <div class="row">
+        <span class="key" id="rpDateLabel">Ημερομηνία backup:</span>
+        <span class="val" id="rpDate">—</span>
+      </div>
+      <div class="row">
+        <span class="key" id="rpIncomeLabel">Έσοδα:</span>
+        <span class="val" id="rpIncome">0</span>
+      </div>
+      <div class="row">
+        <span class="key" id="rpExpenseLabel">Έξοδα:</span>
+        <span class="val" id="rpExpense">0</span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeRestoreModal()" id="btnRestoreCancel">Άκυρο</button>
+      <button class="btn-save warn" onclick="confirmRestore()" id="btnRestoreConfirm" disabled>
+        <i class="fas fa-upload"></i> <span id="btnRestoreConfirmText">Επαναφορά</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Όλα τα έτη -->
+<div class="modal-bg" id="allYearsModalBg">
+  <div class="modal years-modal">
+    <h3><i class="fas fa-list"></i> <span id="allYearsTitle">Όλα τα έτη</span></h3>
+    <p id="allYearsSubtitle">Έτη που έχουν καταχωρήσεις</p>
+
+    <div class="years-list" id="yearsList"></div>
+
+    <div class="modal-actions" style="margin-top: 1.5rem;">
+      <button class="btn-cancel" onclick="closeAllYearsModal()" id="btnAllYearsClose">Κλείσιμο</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Πώς λειτουργεί -->
+<div class="modal-bg" id="howModalBg">
+  <div class="modal how-modal">
+    <div class="how-header">
+      <h3>
+        <i class="fas fa-circle-info"></i>
+        <span id="howModalTitle">Πώς λειτουργεί</span>
+      </h3>
+      <div class="how-lang">
+        <button id="howLangEl" class="active" onclick="setHowLang('el')">ΕΛ</button>
+        <button id="howLangEn" onclick="setHowLang('en')">EN</button>
+      </div>
+    </div>
+    <p id="howModalSubtitle">Σύντομος οδηγός χρήσης</p>
+
+    <div class="how-body" id="howBody"></div>
+
+    <div class="modal-actions" style="margin-top: 1.5rem;">
+      <button class="btn-save" onclick="closeHowModal()" id="btnHowClose"><i class="fas fa-check"></i> Κατάλαβα</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ============================================================
+     TRANSLATIONS
+     ============================================================ */
+  const TRANSLATIONS = {
+    el: {
+      pageTitle: 'Έσοδα – Έξοδα',
+      autosaveLabel: 'Auto-backup',
+      autosaveStatus: 'Αυτόματη αποθήκευση',
+      today: 'Σήμερα:',
+      prevMonth: 'Προηγούμενος μήνας',
+      nextMonth: 'Επόμενος μήνας',
+      currentMonthBtn: 'Τρέχων μήνας',
+      incomeTitle: 'Έσοδα',
+      expenseTitle: 'Έξοδα',
+      amountPlaceholder: 'Ποσό €',
+      addTitle: 'Προσθήκη',
+      howBtn: 'Πώς λειτουργεί',
+      restoreBtn: 'Επαναφορά',
+      allYearsBtn: 'Όλα τα έτη',
+      totalMonth: 'Σύνολο Μήνα',
+      summaryTitle: 'Καθαρό Υπόλοιπο Μήνα',
+      incomeLabel: 'Έσοδα',
+      expenseLabel: 'Έξοδα',
+      saveLabel: 'Αποταμίευση',
+      footerNote: 'Οι εγγραφές αποθηκεύονται τοπικά στον browser σου.',
+      resetAll: 'Καθαρισμός όλων',
+      yearTitle: 'Σύνολο Έτους',
+      yearBalance: 'Υπόλοιπο',
+      modalTitle: 'Νέα Κατηγορία',
+      modalSubtitleIncome: 'Προσθήκη νέας κατηγορίας εσόδων',
+      modalSubtitleExpense: 'Προσθήκη νέας κατηγορίας εξόδων',
+      newCategoryPlaceholder: 'Όνομα κατηγορίας',
+      cancel: 'Άκυρο',
+      save: 'Αποθήκευση',
+      close: 'Κλείσιμο',
+      empty: 'Δεν υπάρχουν εγγραφές για αυτόν τον μήνα',
+      monthSuffix: '  •  τρέχων',
+      monthHasData: '  •',
+      confirmReset: 'Διαγραφή ΟΛΩΝ των εγγραφών; (Οι κατηγορίες διατηρούνται)',
+      catExists: 'Η κατηγορία υπάρχει ήδη!',
+      saveNoticeDone: 'Λήψη: ',
+      restoreDone: 'Επαναφορά ολοκληρώθηκε!',
+      restoreError: 'Μη έγκυρο αρχείο backup',
+      restoreNoData: 'Δεν βρέθηκαν δεδομένα στο αρχείο',
+      restoreConfirm: 'Η επαναφορά θα ΑΝΤΙΚΑΤΑΣΤΗΣΕΙ όλα τα τρέχοντα δεδομένα σου. Συνέχεια;',
+      confirmDelCat: 'Διαγραφή της κατηγορίας "{cat}";\n\nΟι υπάρχουσες εγγραφές με αυτή την κατηγορία δεν θα διαγραφούν, αλλά θα εμφανίζονται χωρίς μετάφραση.',
+      cannotDelBuiltin: 'Δεν μπορείς να διαγράψεις τις προεπιλεγμένες κατηγορίες. Μόνο τις δικές σου.',
+      months: ['Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος',
+               'Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'],
+      docTitle: 'Έσοδα – Έξοδα',
+      restoreTitle: 'Επαναφορά από backup',
+      restoreSubtitle: 'Επίλεξε ένα αρχείο JSON backup για να ανακτήσεις τα δεδομένα σου',
+      restoreDropText: 'Κλικ για επιλογή αρχείου',
+      restoreDropSub: 'ή σύρε και άφησε το αρχείο εδώ',
+      restoreFile: 'Αρχείο:',
+      restoreDate: 'Ημερομηνία backup:',
+      restoreIncomeCount: 'Έσοδα:',
+      restoreExpenseCount: 'Έξοδα:',
+      restoreConfirmBtn: 'Επαναφορά',
+      allYearsTitle: 'Όλα τα έτη',
+      allYearsSubtitle: 'Έτη που έχουν καταχωρήσεις',
+      allYearsEmpty: 'Δεν υπάρχουν δεδομένα ακόμα',
+      allYearsRecords: 'εγγραφές',
+      howTitle: 'Πώς λειτουργεί',
+      howSubtitle: 'Σύντομος οδηγός χρήσης',
+      howClose: 'Κατάλαβα',
+      howContent: `
+        <h4><i class="fas fa-plus-circle"></i> Προσθήκη εγγραφής</h4>
+        <ul>
+          <li>Διάλεξε <strong>κατηγορία</strong> από το dropdown</li>
+          <li>Γράψε το <strong>ποσό</strong> σε ευρώ</li>
+          <li>Πάτα <strong>+</strong> ή <code>Enter</code></li>
+          <li>Η <strong>ημερομηνία μπαίνει αυτόματα</strong> με τη σημερινή μέρα</li>
+        </ul>
+
+        <h4><i class="fas fa-folder-plus"></i> Νέα κατηγορία</h4>
+        <ul>
+          <li>Πάτα το εικονίδιο <strong>📁</strong> δίπλα στο «+»</li>
+          <li>Γράψε το όνομα και πάτα <strong>Αποθήκευση</strong></li>
+        </ul>
+
+        <h4><i class="fas fa-trash"></i> Διαγραφή κατηγορίας</h4>
+        <ul>
+          <li>Πάτα το εικονίδιο <strong>🗑️</strong></li>
+          <li>Μπορείς να διαγράψεις <strong>μόνο</strong> τις δικές σου</li>
+          <li>Οι προεπιλεγμένες παραμένουν πάντα</li>
+        </ul>
+
+        <h4><i class="fas fa-calendar"></i> Επιλογή έτους</h4>
+        <ul>
+          <li>Διάλεξε έτος από το <strong>dropdown</strong> στην κάρτα «Σύνολο Έτους»</li>
+          <li>Όταν αλλάζεις έτος → πηγαίνει <strong>αυτόματα στον Ιανουάριο</strong></li>
+          <li>Πάτα <strong>Όλα τα έτη</strong> για να δεις ποια έτη έχουν δεδομένα</li>
+        </ul>
+
+        <h4><i class="fas fa-calendar-alt"></i> Επιλογή μήνα</h4>
+        <ul>
+          <li>Χρησιμοποίησε τα βελάκια <strong>◀ ▶</strong> ή τη λίστα</li>
+          <li>Βλέπεις <strong>μόνο</strong> τις εγγραφές του μήνα</li>
+        </ul>
+
+        <h4><i class="fas fa-chart-line"></i> Σύνολα</h4>
+        <ul>
+          <li><strong>Σύνολο Έτους</strong>: όλες οι εγγραφές του επιλεγμένου έτους</li>
+          <li><strong>Σύνολο Μήνα</strong>: μόνο ο τρέχων μήνας</li>
+        </ul>
+
+        <h4><i class="fas fa-upload"></i> Επαναφορά / Auto-backup</h4>
+        <ul>
+          <li><strong>Επαναφορά</strong>: επίλεξε ή σύρε αρχείο <code>.json</code></li>
+          <li><strong>Auto-backup</strong>: κατεβάζει αρχείο με κάθε αλλαγή</li>
+        </ul>
+
+        <div class="tip">
+          <i class="fas fa-lightbulb"></i>
+          <strong>Συμβουλή:</strong> Κράτα τα backup σε ασφαλές σημείο — αν καθαρίσεις τα δεδομένα του browser, θα τα χάσεις.
+        </div>
+      `
+    },
+    en: {
+      pageTitle: 'Income – Expenses',
+      autosaveLabel: 'Auto-backup',
+      autosaveStatus: 'Auto-save enabled',
+      today: 'Today:',
+      prevMonth: 'Previous month',
+      nextMonth: 'Next month',
+      currentMonthBtn: 'Current month',
+      incomeTitle: 'Income',
+      expenseTitle: 'Expenses',
+      amountPlaceholder: 'Amount €',
+      addTitle: 'Add',
+      howBtn: 'How it works',
+      restoreBtn: 'Restore',
+      allYearsBtn: 'All years',
+      totalMonth: 'Monthly Total',
+      summaryTitle: 'Net Monthly Balance',
+      incomeLabel: 'Income',
+      expenseLabel: 'Expenses',
+      saveLabel: 'Savings',
+      footerNote: 'Records are stored locally in your browser.',
+      resetAll: 'Clear all',
+      yearTitle: 'Year Total',
+      yearBalance: 'Balance',
+      modalTitle: 'New Category',
+      modalSubtitleIncome: 'Add a new income category',
+      modalSubtitleExpense: 'Add a new expense category',
+      newCategoryPlaceholder: 'Category name',
+      cancel: 'Cancel',
+      save: 'Save',
+      close: 'Close',
+      empty: 'No records for this month',
+      monthSuffix: '  •  current',
+      monthHasData: '  •',
+      confirmReset: 'Delete ALL records? (Categories are kept)',
+      catExists: 'Category already exists!',
+      saveNoticeDone: 'Downloaded: ',
+      restoreDone: 'Restore completed!',
+      restoreError: 'Invalid backup file',
+      restoreNoData: 'No data found in the file',
+      restoreConfirm: 'Restore will OVERWRITE all current data. Continue?',
+      confirmDelCat: 'Delete category "{cat}"?\n\nExisting records with this category won\'t be deleted, but will appear untranslated.',
+      cannotDelBuiltin: 'You cannot delete built-in categories. Only your own.',
+      months: ['January','February','March','April','May','June',
+               'July','August','September','October','November','December'],
+      docTitle: 'Income – Expenses',
+      restoreTitle: 'Restore from backup',
+      restoreSubtitle: 'Choose a JSON backup file to recover your data',
+      restoreDropText: 'Click to choose a file',
+      restoreDropSub: 'or drag and drop it here',
+      restoreFile: 'File:',
+      restoreDate: 'Backup date:',
+      restoreIncomeCount: 'Income:',
+      restoreExpenseCount: 'Expenses:',
+      restoreConfirmBtn: 'Restore',
+      allYearsTitle: 'All years',
+      allYearsSubtitle: 'Years that have records',
+      allYearsEmpty: 'No data yet',
+      allYearsRecords: 'records',
+      howTitle: 'How it works',
+      howSubtitle: 'A quick user guide',
+      howClose: 'Got it',
+      howContent: `
+        <h4><i class="fas fa-plus-circle"></i> Adding a record</h4>
+        <ul>
+          <li>Choose a <strong>category</strong> from the dropdown</li>
+          <li>Type the <strong>amount</strong> in euros</li>
+          <li>Press <strong>+</strong> or <code>Enter</code></li>
+          <li>The <strong>date is added automatically</strong> with today's date</li>
+        </ul>
+
+        <h4><i class="fas fa-folder-plus"></i> New category</h4>
+        <ul>
+          <li>Click the <strong>📁</strong> icon next to «+»</li>
+          <li>Type the name and press <strong>Save</strong></li>
+        </ul>
+
+        <h4><i class="fas fa-trash"></i> Delete category</h4>
+        <ul>
+          <li>Click the <strong>🗑️</strong> icon</li>
+          <li>You can delete <strong>only</strong> your custom ones</li>
+          <li>Built-in categories always remain</li>
+        </ul>
+
+        <h4><i class="fas fa-calendar"></i> Year selection</h4>
+        <ul>
+          <li>Pick a year from the <strong>dropdown</strong> in the "Year Total" card</li>
+          <li>When you change year → it goes <strong>automatically to January</strong></li>
+          <li>Click <strong>All years</strong> to see which years have data</li>
+        </ul>
+
+        <h4><i class="fas fa-calendar-alt"></i> Month selection</h4>
+        <ul>
+          <li>Use the <strong>◀ ▶</strong> arrows or the list</li>
+          <li>You see <strong>only</strong> the records of that month</li>
+        </ul>
+
+        <h4><i class="fas fa-chart-line"></i> Totals</h4>
+        <ul>
+          <li><strong>Year Total</strong>: all records of the selected year</li>
+          <li><strong>Monthly Total</strong>: only the current month</li>
+        </ul>
+
+        <h4><i class="fas fa-upload"></i> Restore / Auto-backup</h4>
+        <ul>
+          <li><strong>Restore</strong>: choose or drag a <code>.json</code> file</li>
+          <li><strong>Auto-backup</strong>: downloads a file on every change</li>
+        </ul>
+
+        <div class="tip">
+          <i class="fas fa-lightbulb"></i>
+          <strong>Tip:</strong> Keep your backups safe — if you clear browser data, you'll lose it.
+        </div>
+      `
+    }
+  };
+
+  /* ============================================================
+     CATEGORIES
+     ============================================================ */
+  const DEFAULT_CATEGORIES = {
+    income: [
+      { id: 'salary',      el: 'Μισθός',    en: 'Salary' },
+      { id: 'allowance',   el: 'Επίδομα',   en: 'Allowance' },
+      { id: 'betting',     el: 'Στοίχημα',  en: 'Betting' },
+      { id: 'transfer',    el: 'Μεταφορά',  en: 'Transfer' }
+    ],
+    expense: [
+      { id: 'water',       el: 'Νερό',              en: 'Water' },
+      { id: 'internet',    el: 'Internet',          en: 'Internet' },
+      { id: 'electricity', el: 'Ρεύμα',             en: 'Electricity' },
+      { id: 'rent',        el: 'Ενοίκιο',           en: 'Rent' },
+      { id: 'groceries',   el: 'Ψώνια',             en: 'Groceries' },
+      { id: 'fun',         el: 'Διασκέδαση',        en: 'Entertainment' },
+      { id: 'transport',   el: 'Μεταφορά',          en: 'Transfer' },
+      { id: 'other',       el: 'Λοιπές συναλλαγές', en: 'Other transactions' }
+    ]
+  };
+
+  function getBuiltinIds(tp) { return DEFAULT_CATEGORIES[tp].map(c => c.id); }
+
+  /* ============================================================
+     STATE
+     ============================================================ */
+  let lang = 'el';
+  let howLang = 'el';
+  let autosaveOn = false;
+  let data = { income: [], expense: [] };
+  let categories = { income: [], expense: [] };
+  let customLabels = {};
+  let currentYear = new Date().getFullYear();
+  let currentMonth = '';
+  let modalTarget = null;
+  let pendingRestore = null;
+
+  function t(key) { return TRANSLATIONS[lang][key]; }
+  function tHow(key) { return TRANSLATIONS[howLang][key]; }
+  function months() { return TRANSLATIONS[lang].months; }
+
+  function todayISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function nowFilenameStamp() {
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate())
+         + '_' + pad(d.getHours()) + '-' + pad(d.getMinutes()) + '-' + pad(d.getSeconds());
+  }
+  function currentYearReal() { return new Date().getFullYear(); }
+  function currentMonthKeyReal() { return todayISO().slice(0,7); }
+  function monthKeyFromDate(iso) { return iso.slice(0,7); }
+  function yearFromDate(iso) { return iso.slice(0,4); }
+
+  function formatEuro(v) {
+    const locale = lang === 'el' ? 'el-GR' : 'en-IE';
+    return '€ ' + v.toLocaleString(locale, {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function formatNumber(v) {
+    const locale = lang === 'el' ? 'el-GR' : 'en-IE';
+    return v.toLocaleString(locale, {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function formatDateGR(iso) {
+    const [y,m,d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  function formatTodayLong() {
+    const d = new Date();
+    return d.getDate() + ' ' + months()[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  function monthLabel(key) {
+    const [y, m] = key.split('-');
+    return months()[parseInt(m,10)-1] + ' ' + y;
+  }
+
+  /* ============================================================
+     ΚΑΤΗΓΟΡΙΕΣ
+     ============================================================ */
+  function getCatLabel(id) {
+    if (customLabels[id]) {
+      return lang === 'el' ? customLabels[id].el : customLabels[id].en;
+    }
+    for (const tp of ['income','expense']) {
+      const found = DEFAULT_CATEGORIES[tp].find(c => c.id === id);
+      if (found) return lang === 'el' ? found.el : found.en;
+    }
+    return id;
+  }
+  function getItemLabel(item) {
+    const isKnownId = customLabels[item.desc] ||
+                      DEFAULT_CATEGORIES.income.some(c => c.id === item.desc) ||
+                      DEFAULT_CATEGORIES.expense.some(c => c.id === item.desc);
+    if (isKnownId) return getCatLabel(item.desc);
+    return item.desc;
+  }
+  function isBuiltin(tp, id) { return getBuiltinIds(tp).includes(id); }
+
+  /* ============================================================
+     SAVE / LOAD
+     ============================================================ */
+  function save() {
+    localStorage.setItem('budgetDataV9', JSON.stringify(data));
+    localStorage.setItem('budgetCategoriesV9', JSON.stringify(categories));
+    localStorage.setItem('budgetCustomLabelsV9', JSON.stringify(customLabels));
+    localStorage.setItem('budgetLangV9', lang);
+    localStorage.setItem('budgetAutosaveV9', autosaveOn ? '1' : '0');
+    localStorage.setItem('budgetYearV9', currentYear);
+  }
+  function load() {
+    try {
+      const d = JSON.parse(localStorage.getItem('budgetDataV9') || 'null');
+      if (d) data = d;
+      const c = JSON.parse(localStorage.getItem('budgetCategoriesV9') || 'null');
+      if (c) categories = c;
+      const cl = JSON.parse(localStorage.getItem('budgetCustomLabelsV9') || 'null');
+      if (cl) customLabels = cl;
+      const l = localStorage.getItem('budgetLangV9');
+      if (l === 'el' || l === 'en') lang = l;
+      const a = localStorage.getItem('budgetAutosaveV9');
+      autosaveOn = (a === '1');
+      const y = localStorage.getItem('budgetYearV9');
+      if (y && /^\d{4}$/.test(y)) currentYear = parseInt(y, 10);
+    } catch(e) {}
+    if (!categories.income || categories.income.length === 0)
+      categories.income = DEFAULT_CATEGORIES.income.map(c => c.id);
+    if (!categories.expense || categories.expense.length === 0)
+      categories.expense = DEFAULT_CATEGORIES.expense.map(c => c.id);
+    ['income','expense'].forEach(tp => {
+      (data[tp]||[]).forEach(item => { if (!item.date) item.date = todayISO(); });
+    });
+  }
+
+  function downloadBackup() {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      language: lang,
+      data: data,
+      categories: categories,
+      customLabels: customLabels
+    };
+    const json = JSON.stringify(payload, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const filename = 'budget-backup_' + nowFilenameStamp() + '.json';
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showNotice(t('saveNoticeDone') + filename, 'ok');
+  }
+
+  function showNotice(text, type) {
+    const notice = document.getElementById('saveNotice');
+    const icon = notice.querySelector('i');
+    document.getElementById('saveNoticeText').textContent = text;
+    notice.classList.remove('warn','err');
+    if (type === 'warn') { notice.classList.add('warn'); icon.className = 'fas fa-exclamation-triangle'; }
+    else if (type === 'err') { notice.classList.add('err'); icon.className = 'fas fa-times-circle'; }
+    else { icon.className = 'fas fa-download'; }
+    notice.classList.add('show');
+    clearTimeout(window.__noticeTimer);
+    window.__noticeTimer = setTimeout(() => notice.classList.remove('show'), 3200);
+  }
+
+  function toggleAutosave() {
+    autosaveOn = !autosaveOn;
+    updateAutosaveUI();
+    save();
+    if (autosaveOn) downloadBackup();
+  }
+  function updateAutosaveUI() {
+    document.getElementById('autosaveToggle').classList.toggle('active', autosaveOn);
+  }
+
+  /* ============================================================
+     ΓΛΩΣΣΑ
+     ============================================================ */
+  function setLang(newLang) {
+    if (lang === newLang) return;
+    lang = newLang;
+    save();
+    applyTranslations();
+    renderCategoryOptions();
+    populateYearSelect();
+    populateMonthSelect();
+    render();
+  }
+  function setHowLang(newLang) {
+    if (howLang === newLang) return;
+    howLang = newLang;
+    applyHowTranslations();
+  }
+
+  function applyTranslations() {
+    document.title = t('docTitle');
+    document.getElementById('pageTitle').textContent = t('pageTitle');
+    document.getElementById('autosaveLabel').textContent = t('autosaveLabel');
+    document.getElementById('autosaveStatus').textContent = t('autosaveStatus');
+    document.getElementById('todayLabelPrefix').textContent = t('today');
+    document.getElementById('btnTodayText').textContent = t('currentMonthBtn');
+    document.getElementById('incomeTitle').textContent = t('incomeTitle');
+    document.getElementById('expenseTitle').textContent = t('expenseTitle');
+    document.getElementById('incomeAmount').placeholder = t('amountPlaceholder');
+    document.getElementById('expenseAmount').placeholder = t('amountPlaceholder');
+    document.getElementById('btnAddIncome').title = t('addTitle');
+    document.getElementById('btnAddExpense').title = t('addTitle');
+    document.getElementById('btnHowText').textContent = t('howBtn');
+    document.getElementById('btnRestoreText').textContent = t('restoreBtn');
+    document.getElementById('btnAllYearsText').textContent = t('allYearsBtn');
+    document.getElementById('totalIncomeLabel').textContent = t('totalMonth');
+    document.getElementById('totalExpenseLabel').textContent = t('totalMonth');
+    document.getElementById('summaryTitle').textContent = t('summaryTitle');
+    document.getElementById('statIncomeLabel').textContent = t('incomeLabel');
+    document.getElementById('statExpenseLabel').textContent = t('expenseLabel');
+    document.getElementById('statSaveLabel').textContent = t('saveLabel');
+    document.getElementById('footerNote').textContent = t('footerNote');
+    document.getElementById('btnResetText').textContent = t('resetAll');
+    document.getElementById('modalTitle').textContent = t('modalTitle');
+    document.getElementById('newCategoryInput').placeholder = t('newCategoryPlaceholder');
+    document.getElementById('btnModalCancel').textContent = t('cancel');
+    document.getElementById('btnModalSave').innerHTML = '<i class="fas fa-check"></i> ' + t('save');
+    document.getElementById('todayLabel').textContent = formatTodayLong();
+    document.getElementById('yearTitleLabel').textContent = t('yearTitle');
+    document.getElementById('yearIncomeLabel').textContent = t('incomeLabel');
+    document.getElementById('yearExpenseLabel').textContent = t('expenseLabel');
+    document.getElementById('yearBalanceLabel').textContent = t('yearBalance');
+    document.getElementById('restoreTitle').textContent = t('restoreTitle');
+    document.getElementById('restoreSubtitle').textContent = t('restoreSubtitle');
+    document.getElementById('restoreDropText').textContent = t('restoreDropText');
+    document.getElementById('restoreDropSub').textContent = t('restoreDropSub');
+    document.getElementById('rpFileLabel').textContent = t('restoreFile');
+    document.getElementById('rpDateLabel').textContent = t('restoreDate');
+    document.getElementById('rpIncomeLabel').textContent = t('restoreIncomeCount');
+    document.getElementById('rpExpenseLabel').textContent = t('restoreExpenseCount');
+    document.getElementById('btnRestoreCancel').textContent = t('cancel');
+    document.getElementById('btnRestoreConfirmText').textContent = t('restoreConfirmBtn');
+    document.getElementById('allYearsTitle').textContent = t('allYearsTitle');
+    document.getElementById('allYearsSubtitle').textContent = t('allYearsSubtitle');
+    document.getElementById('btnAllYearsClose').textContent = t('close');
+
+    document.getElementById('btnLangEl').classList.toggle('active', lang === 'el');
+    document.getElementById('btnLangEn').classList.toggle('active', lang === 'en');
+    document.getElementById('btnPrev').title = t('prevMonth');
+    document.getElementById('btnNext').title = t('nextMonth');
+
+    updateDeleteCatButtons();
+  }
+
+  function applyHowTranslations() {
+    document.getElementById('howModalTitle').textContent = tHow('howTitle');
+    document.getElementById('howModalSubtitle').textContent = tHow('howSubtitle');
+    document.getElementById('btnHowClose').innerHTML = '<i class="fas fa-check"></i> ' + tHow('howClose');
+    document.getElementById('howBody').innerHTML = tHow('howContent');
+    document.getElementById('howLangEl').classList.toggle('active', howLang === 'el');
+    document.getElementById('howLangEn').classList.toggle('active', howLang === 'en');
+  }
+
+  /* ============================================================
+     HOW MODAL
+     ============================================================ */
+  function openHowModal() {
+    howLang = lang;
+    applyHowTranslations();
+    document.getElementById('howModalBg').classList.add('active');
+  }
+  function closeHowModal() {
+    document.getElementById('howModalBg').classList.remove('active');
+  }
+
+  /* ============================================================
+     RESTORE MODAL
+     ============================================================ */
+  function openRestoreModal() {
+    pendingRestore = null;
+    document.getElementById('restoreFileInput').value = '';
+    document.getElementById('restorePreview').classList.remove('show');
+    document.getElementById('btnRestoreConfirm').disabled = true;
+    document.getElementById('restoreModalBg').classList.add('active');
+  }
+  function closeRestoreModal() {
+    document.getElementById('restoreModalBg').classList.remove('active');
+    pendingRestore = null;
+  }
+  function handleRestoreFile(file) {
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      showNotice(t('restoreError'), 'err');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        if (!parsed.data || !Array.isArray(parsed.data.income) || !Array.isArray(parsed.data.expense)) {
+          showNotice(t('restoreNoData'), 'err');
+          return;
+        }
+        pendingRestore = {
+          data: parsed.data,
+          categories: parsed.categories || null,
+          customLabels: parsed.customLabels || {},
+          exportedAt: parsed.exportedAt || null,
+          filename: file.name
+        };
+        document.getElementById('rpFileName').textContent = file.name;
+        const dt = parsed.exportedAt ? new Date(parsed.exportedAt) : null;
+        document.getElementById('rpDate').textContent = dt
+          ? dt.toLocaleString(lang === 'el' ? 'el-GR' : 'en-IE')
+          : '—';
+        document.getElementById('rpIncome').textContent = parsed.data.income.length;
+        document.getElementById('rpExpense').textContent = parsed.data.expense.length;
+        document.getElementById('restorePreview').classList.add('show');
+        document.getElementById('btnRestoreConfirm').disabled = false;
+      } catch (err) {
+        showNotice(t('restoreError'), 'err');
+      }
+    };
+    reader.readAsText(file);
+  }
+  function confirmRestore() {
+    if (!pendingRestore) return;
+    if (!confirm(t('restoreConfirm'))) return;
+    data = pendingRestore.data;
+    ['income','expense'].forEach(tp => {
+      (data[tp]||[]).forEach(item => { if (!item.date) item.date = todayISO(); });
+    });
+    if (pendingRestore.categories) {
+      categories = pendingRestore.categories;
+    } else {
+      categories = {
+        income: DEFAULT_CATEGORIES.income.map(c => c.id),
+        expense: DEFAULT_CATEGORIES.expense.map(c => c.id)
+      };
+    }
+    customLabels = pendingRestore.customLabels || {};
+    ['income','expense'].forEach(tp => {
+      data[tp].forEach(item => {
+        if (item.desc && !categories[tp].includes(item.desc)) {
+          categories[tp].push(item.desc);
+        }
+      });
+    });
+    save();
+    populateYearSelect();
+    populateMonthSelect();
+    renderCategoryOptions();
+    render();
+    updateDeleteCatButtons();
+    closeRestoreModal();
+    showNotice(t('restoreDone'), 'ok');
+    if (autosaveOn) downloadBackup();
+  }
+
+  /* ============================================================
+     ΚΑΤΗΓΟΡΙΕΣ OPTIONS
+     ============================================================ */
+  function renderCategoryOptions() {
+    ['income','expense'].forEach(tp => {
+      const sel = document.getElementById(tp + 'Category');
+      const prev = sel.value;
+      sel.innerHTML = '';
+      categories[tp].forEach(catId => {
+        const opt = document.createElement('option');
+        opt.value = catId;
+        opt.textContent = getCatLabel(catId);
+        sel.appendChild(opt);
+      });
+      if (prev && categories[tp].includes(prev)) sel.value = prev;
+    });
+    updateDeleteCatButtons();
+  }
+  function updateDeleteCatButtons() {
+    ['income','expense'].forEach(tp => {
+      const sel = document.getElementById(tp + 'Category');
+      const btn = document.getElementById('btnDel' + (tp === 'income' ? 'Income' : 'Expense') + 'Cat');
+      if (!sel || !btn) return;
+      const catId = sel.value;
+      btn.disabled = !catId || isBuiltin(tp, catId);
+    });
+  }
+  function deleteCategory(tp) {
+    const sel = document.getElementById(tp + 'Category');
+    const catId = sel.value;
+    if (!catId) return;
+    if (isBuiltin(tp, catId)) { alert(t('cannotDelBuiltin')); return; }
+    const label = getCatLabel(catId);
+    if (!confirm(t('confirmDelCat').replace('{cat}', label))) return;
+    categories[tp] = categories[tp].filter(id => id !== catId);
+    delete customLabels[catId];
+    save();
+    renderCategoryOptions();
+    render();
+    if (autosaveOn) downloadBackup();
+  }
+  function openAddCategory(target) {
+    modalTarget = target;
+    document.getElementById('modalSubtitle').textContent =
+      target === 'income' ? t('modalSubtitleIncome') : t('modalSubtitleExpense');
+    document.getElementById('newCategoryInput').value = '';
+    document.getElementById('modalBg').classList.add('active');
+    setTimeout(() => document.getElementById('newCategoryInput').focus(), 100);
+  }
+  function closeModal() {
+    document.getElementById('modalBg').classList.remove('active');
+    modalTarget = null;
+  }
+  function saveNewCategory() {
+    const input = document.getElementById('newCategoryInput');
+    const raw = input.value.trim();
+    if (!raw) { input.focus(); return; }
+    const exists = categories[modalTarget].some(id => getCatLabel(id).toLowerCase() === raw.toLowerCase());
+    if (exists) { alert(t('catExists')); input.focus(); return; }
+    const id = 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+    customLabels[id] = { el: raw, en: raw };
+    categories[modalTarget].push(id);
+    categories[modalTarget].sort((a,b) => getCatLabel(a).localeCompare(getCatLabel(b), lang));
+    save();
+    renderCategoryOptions();
+    document.getElementById(modalTarget + 'Category').value = id;
+    updateDeleteCatButtons();
+    closeModal();
+  }
+
+  /* ============================================================
+     ΕΤΗ
+     ============================================================ */
+  function getYearsWithData() {
+    const years = new Set();
+    ['income','expense'].forEach(tp => {
+      data[tp].forEach(item => {
+        if (item.date) years.add(yearFromDate(item.date));
+      });
+    });
+    return Array.from(years).sort().reverse(); // νεότερα πρώτα
+  }
+
+  function getAllYearsForSelect() {
+    // Όλα τα έτη που έχουν δεδομένα + το τρέχον έτος
+    const years = new Set(getYearsWithData());
+    years.add(String(currentYearReal()));
+    return Array.from(years).sort().reverse();
+  }
+
+  function populateYearSelect() {
+    const sel = document.getElementById('yearSelect');
+    const years = getAllYearsForSelect();
+
+    // Αν το τρέχον currentYear δεν υπάρχει, βάλε το τρέχον πραγματικό
+    if (!years.includes(String(currentYear))) {
+      currentYear = currentYearReal();
+    }
+
+    sel.innerHTML = '';
+    years.forEach(y => {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y;
+      if (parseInt(y,10) === currentYear) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function changeYear() {
+    const sel = document.getElementById('yearSelect');
+    currentYear = parseInt(sel.value, 10);
+    // Πήγαινε στον Ιανουάριο του έτους
+    currentMonth = currentYear + '-01';
+    save();
+    populateMonthSelect();
+    render();
+  }
+
+  /* ============================================================
+     ALL YEARS MODAL
+     ============================================================ */
+  function openAllYearsModal() {
+    renderYearsList();
+    document.getElementById('allYearsModalBg').classList.add('active');
+  }
+  function closeAllYearsModal() {
+    document.getElementById('allYearsModalBg').classList.remove('active');
+  }
+  function renderYearsList() {
+    const list = document.getElementById('yearsList');
+    const years = getYearsWithData();
+    list.innerHTML = '';
+
+    if (years.length === 0) {
+      list.innerHTML = '<div class="years-empty">' + t('allYearsEmpty') + '</div>';
+      return;
+    }
+
+    years.forEach(y => {
+      const yIncomes  = data.income.filter(i  => i.date && yearFromDate(i.date) === y);
+      const yExpenses = data.expense.filter(i => i.date && yearFromDate(i.date) === y);
+      const tI = yIncomes.reduce((s,i)  => s + i.amount, 0);
+      const tE = yExpenses.reduce((s,i) => s + i.amount, 0);
+      const bal = tI - tE;
+      const count = yIncomes.length + yExpenses.length;
+
+      const item = document.createElement('button');
+      item.className = 'year-item';
+      item.onclick = () => {
+        currentYear = parseInt(y, 10);
+        currentMonth = currentYear + '-01';
+        save();
+        populateYearSelect();
+        populateMonthSelect();
+        render();
+        closeAllYearsModal();
+      };
+      item.innerHTML = `
+        <div class="yi-year">
+          <span class="yi-number">${y}</span>
+          <span class="yi-count">${count} ${t('allYearsRecords')}</span>
+        </div>
+        <div class="yi-totals">
+          <div class="yi-stat">
+            <span class="yi-label">${t('incomeLabel')}</span>
+            <span class="yi-value inc">${formatEuro(tI)}</span>
+          </div>
+          <div class="yi-stat">
+            <span class="yi-label">${t('expenseLabel')}</span>
+            <span class="yi-value exp">${formatEuro(tE)}</span>
+          </div>
+          <div class="yi-stat">
+            <span class="yi-label">${t('yearBalance')}</span>
+            <span class="yi-value bal ${bal < 0 ? 'neg' : ''}">${formatEuro(bal)}</span>
+          </div>
+        </div>`;
+      list.appendChild(item);
+    });
+  }
+
+  /* ============================================================
+     ΜΗΝΕΣ
+     ============================================================ */
+  function buildMonthList() {
+    // Πάντα 12 μήνες του τρέχοντος έτους (currentYear)
+    const list = [];
+    for (let m = 1; m <= 12; m++) {
+      list.push(currentYear + '-' + String(m).padStart(2,'0'));
+    }
+    return list;
+  }
+
+  function populateMonthSelect() {
+    const sel = document.getElementById('monthSelect');
+    const list = buildMonthList();
+
+    if (!list.includes(currentMonth)) {
+      currentMonth = currentYear + '-01';
+    }
+
+    sel.innerHTML = '';
+    list.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      const label = monthLabel(m);
+      const isThisMonth = (m === currentMonthKeyReal());
+      const hasData = data.income.some(i => monthKeyFromDate(i.date) === m)
+                   || data.expense.some(i => monthKeyFromDate(i.date) === m);
+      opt.textContent = label + (isThisMonth ? t('monthSuffix') : (hasData ? t('monthHasData') : ''));
+      if (m === currentMonth) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function changeMonth() { currentMonth = document.getElementById('monthSelect').value; render(); }
+  function prevMonth() {
+    const [y, m] = currentMonth.split('-').map(Number);
+    if (m === 1) {
+      // Πάμε στον Δεκέμβριο του προηγούμενου έτους
+      currentYear = y - 1;
+      currentMonth = currentYear + '-12';
+      save();
+      populateYearSelect();
+    } else {
+      currentMonth = y + '-' + String(m - 1).padStart(2,'0');
+    }
+    populateMonthSelect();
+    render();
+  }
+  function nextMonth() {
+    const [y, m] = currentMonth.split('-').map(Number);
+    if (m === 12) {
+      currentYear = y + 1;
+      currentMonth = currentYear + '-01';
+      save();
+      populateYearSelect();
+    } else {
+      currentMonth = y + '-' + String(m + 1).padStart(2,'0');
+    }
+    populateMonthSelect();
+    render();
+  }
+  function goToday() {
+    currentYear = currentYearReal();
+    currentMonth = currentMonthKeyReal();
+    save();
+    populateYearSelect();
+    populateMonthSelect();
+    render();
+  }
+
+  /* ============================================================
+     ΠΡΟΣΘΗΚΗ / ΔΙΑΓΡΑΦΗ
+     ============================================================ */
+  function addItem(type) {
+    const catEl    = document.getElementById(type + 'Category');
+    const amountEl = document.getElementById(type + 'Amount');
+    const catId  = catEl.value;
+    const amount = parseFloat(amountEl.value);
+    const date   = todayISO();
+
+    if (!catId) { catEl.focus(); return; }
+    if (isNaN(amount) || amount <= 0) {
+      amountEl.focus();
+      amountEl.style.borderColor = '#ff5a5f';
+      setTimeout(()=>amountEl.style.borderColor='',1200);
+      return;
+    }
+    data[type].push({
+      id: Date.now() + Math.random(),
+      desc: catId,
+      amount: amount,
+      date: date
+    });
+    // Πήγαινε στον τρέχοντα μήνα/έτος
+    currentYear = currentYearReal();
+    currentMonth = currentMonthKeyReal();
+    amountEl.value = '';
+    amountEl.focus();
+    save();
+    populateYearSelect();
+    populateMonthSelect();
+    render();
+    if (autosaveOn) downloadBackup();
+  }
+
+  function deleteItem(type, id) {
+    data[type] = data[type].filter(i => i.id !== id);
+    save();
+    populateYearSelect();
+    populateMonthSelect();
+    render();
+    if (autosaveOn) downloadBackup();
+  }
+
+  /* ============================================================
+     RENDER
+     ============================================================ */
+  function render() {
+    const incomes  = data.income.filter(i  => i.date && monthKeyFromDate(i.date) === currentMonth);
+    const expenses = data.expense.filter(i => i.date && monthKeyFromDate(i.date) === currentMonth);
+    incomes.sort((a,b)  => b.date.localeCompare(a.date));
+    expenses.sort((a,b) => b.date.localeCompare(a.date));
+    renderList(incomes,  'incomeList',  'income');
+    renderList(expenses, 'expenseList', 'expense');
+    const tI  = incomes.reduce((s,i)  => s + i.amount, 0);
+    const tE  = expenses.reduce((s,i) => s + i.amount, 0);
+    const bal = tI - tE;
+    document.getElementById('totalIncome').textContent  = formatEuro(tI);
+    document.getElementById('totalExpense').textContent = formatEuro(tE);
+    const bEl = document.getElementById('balance');
+    bEl.textContent = formatEuro(bal);
+    bEl.classList.toggle('negative', bal < 0);
+    document.getElementById('statIncome').textContent  = formatNumber(tI);
+    document.getElementById('statExpense').textContent = formatNumber(tE);
+    document.getElementById('statSave').textContent    = (tI > 0 ? (bal/tI*100) : 0).toFixed(1) + '%';
+    renderYearTotals();
+  }
+
+  function renderYearTotals() {
+    document.getElementById('yearNumber') && (document.getElementById('yearNumber').textContent = currentYear);
+    const yearPrefix = currentYear + '-';
+    const yearIncomes  = data.income.filter(i  => i.date && i.date.startsWith(yearPrefix));
+    const yearExpenses = data.expense.filter(i => i.date && i.date.startsWith(yearPrefix));
+    const yI = yearIncomes.reduce((s,i)  => s + i.amount, 0);
+    const yE = yearExpenses.reduce((s,i) => s + i.amount, 0);
+    const yB = yI - yE;
+    document.getElementById('yearIncome').textContent  = formatEuro(yI);
+    document.getElementById('yearExpense').textContent = formatEuro(yE);
+    document.getElementById('yearBalance').textContent = formatEuro(yB);
+    const yBB = document.getElementById('yearBalanceBox');
+    yBB.classList.toggle('negative', yB < 0);
+  }
+
+  function renderList(items, containerId, type) {
+    const c = document.getElementById(containerId);
+    c.innerHTML = '';
+    if (items.length === 0) {
+      c.innerHTML = '<div class="empty-msg">' + t('empty') + '</div>';
+      return;
+    }
+    const aClass = type === 'income' ? 'income-amount' : 'expense-amount';
+    const color  = type === 'income' ? '#00d4aa' : '#ff5a5f';
+    items.forEach(item => {
+      const d = document.createElement('div');
+      d.className = 'list-item';
+      d.innerHTML = `
+        <div class="left">
+          <div class="desc"><i class="fas fa-circle" style="color:${color}; font-size:0.6rem;"></i> ${escapeHtml(getItemLabel(item))}</div>
+          <div class="date"><i class="far fa-calendar"></i> ${formatDateGR(item.date)}</div>
+        </div>
+        <div class="right">
+          <span class="amount ${aClass}">${formatEuro(item.amount)}</span>
+          <button class="btn-delete" title="Delete" onclick="deleteItem('${type}', ${item.id})">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>`;
+      c.appendChild(d);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function resetAll() {
+    if (confirm(t('confirmReset'))) {
+      data = { income: [], expense: [] };
+      save();
+      currentYear = currentYearReal();
+      currentMonth = currentMonthKeyReal();
+      populateYearSelect();
+      populateMonthSelect();
+      render();
+      if (autosaveOn) downloadBackup();
+    }
+  }
+
+  /* ============================================================
+     EVENTS
+     ============================================================ */
+  ['income','expense'].forEach(tp => {
+    document.getElementById(tp+'Amount').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addItem(tp);
+    });
+    document.getElementById(tp+'Category').addEventListener('change', updateDeleteCatButtons);
+  });
+  document.getElementById('newCategoryInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveNewCategory();
+    if (e.key === 'Escape') closeModal();
+  });
+  document.getElementById('modalBg').addEventListener('click', e => {
+    if (e.target.id === 'modalBg') closeModal();
+  });
+  document.getElementById('howModalBg').addEventListener('click', e => {
+    if (e.target.id === 'howModalBg') closeHowModal();
+  });
+  document.getElementById('restoreModalBg').addEventListener('click', e => {
+    if (e.target.id === 'restoreModalBg') closeRestoreModal();
+  });
+  document.getElementById('allYearsModalBg').addEventListener('click', e => {
+    if (e.target.id === 'allYearsModalBg') closeAllYearsModal();
+  });
+  document.getElementById('restoreFileInput').addEventListener('change', e => {
+    handleRestoreFile(e.target.files[0]);
+  });
+  const dropZone = document.getElementById('restoreDrop');
+  ['dragenter','dragover'].forEach(ev => {
+    dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  });
+  ['dragleave','drop'].forEach(ev => {
+    dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleRestoreFile(file);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (document.getElementById('howModalBg').classList.contains('active')) closeHowModal();
+      if (document.getElementById('restoreModalBg').classList.contains('active')) closeRestoreModal();
+      if (document.getElementById('allYearsModalBg').classList.contains('active')) closeAllYearsModal();
+      if (document.getElementById('modalBg').classList.contains('active')) closeModal();
+    }
+  });
+
+  /* ============================================================
+     ΕΚΚΙΝΗΣΗ
+     ============================================================ */
+  load();
+  currentMonth = currentYear + '-01';
+  applyTranslations();
+  updateAutosaveUI();
+  renderCategoryOptions();
+  populateYearSelect();
+  populateMonthSelect();
+  render();
+</script>
+</body>
+</html>
