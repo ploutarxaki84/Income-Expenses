@@ -208,7 +208,6 @@
     50% { opacity: 0.4; }
   }
 
-  /* ΚΑΡΤΑ ΕΤΟΥΣ */
   .year-card {
     background: linear-gradient(135deg, #1a2b3d 0%, #0d1a26 100%);
     border: 1px solid rgba(0, 212, 170, 0.2);
@@ -247,36 +246,63 @@
     align-items: center;
     gap: 0.5rem;
   }
+
   .year-selector-row {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
   }
-  .year-selector {
+
+  .year-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
     background: rgba(0,0,0,0.3);
-    color: #ffffff;
     border: 1.5px solid rgba(0, 212, 170, 0.3);
     border-radius: 12px;
-    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    padding: 0.2rem;
+  }
+  .year-nav button {
+    background: transparent;
+    border: none;
+    color: #7ee7d0;
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+  }
+  .year-nav button:hover:not(:disabled) { background: rgba(0, 212, 170, 0.15); color: #00d4aa; }
+  .year-nav button:disabled { opacity: 0.25; cursor: not-allowed; color: #7d8590; }
+
+  .year-selector {
+    background: transparent;
+    color: #ffffff;
+    border: none;
+    border-left: 1px solid rgba(0, 212, 170, 0.2);
+    border-right: 1px solid rgba(0, 212, 170, 0.2);
+    padding: 0.4rem 2.5rem 0.4rem 1rem;
     font-size: 1.3rem;
     font-weight: 800;
     cursor: pointer;
     outline: none;
     transition: all 0.2s;
-    min-width: 130px;
+    min-width: 120px;
     appearance: none;
     font-family: inherit;
     letter-spacing: -0.02em;
+    text-align: center;
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%2300d4aa%22%20d%3D%22M6%208L2%204h8z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
-    background-position: right 1rem center;
+    background-position: right 0.8rem center;
   }
-  .year-selector:hover { border-color: #00d4aa; background-color: rgba(0,0,0,0.4); }
-  .year-selector:focus {
-    border-color: #00d4aa;
-    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
-  }
+  .year-selector:hover { color: #00d4aa; }
+  .year-selector:focus { color: #00d4aa; }
   .year-selector option { background: #161b22; color: #e6edf3; font-size: 1rem; }
 
   .btn-all-years {
@@ -296,11 +322,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  .btn-all-years:hover {
-    background: rgba(0, 212, 170, 0.1);
-    border-color: #00d4aa;
-    color: #00d4aa;
-  }
+  .btn-all-years:hover { background: rgba(0, 212, 170, 0.1); border-color: #00d4aa; color: #00d4aa; }
 
   .year-stats {
     display: flex;
@@ -309,11 +331,7 @@
     z-index: 1;
     flex-wrap: wrap;
   }
-  .year-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
+  .year-stat { display: flex; flex-direction: column; gap: 0.2rem; }
   .year-stat .y-label {
     color: #7d8590;
     font-size: 0.7rem;
@@ -386,7 +404,8 @@
     align-items: center;
     justify-content: center;
   }
-  .month-selector button:hover { background: #30363d; color: #00d4aa; }
+  .month-selector button:hover:not(:disabled) { background: #30363d; color: #00d4aa; }
+  .month-selector button:disabled { opacity: 0.25; cursor: not-allowed; }
 
   .month-selector select {
     background: #0d1117;
@@ -531,7 +550,8 @@
   }
   .btn-add.income { background: #00d4aa; }
   .btn-add.expense { background: #ff5a5f; color: #ffffff; }
-  .btn-add:hover { transform: translateY(-2px); filter: brightness(1.1); }
+  .btn-add:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
+  .btn-add:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .btn-plus, .btn-del-cat {
     border: 1.5px dashed #30363d;
@@ -829,7 +849,6 @@
   .restore-preview .key { color: #7d8590; }
   .restore-preview .val { color: #7ee7d0; font-weight: 600; }
 
-  /* All-years modal */
   .years-modal {
     max-width: 520px;
     max-height: 80vh;
@@ -858,37 +877,17 @@
     text-align: left;
     width: 100%;
   }
-  .year-item:hover {
-    border-color: #00d4aa;
-    background: rgba(0,212,170,0.04);
-  }
-  .year-item .yi-year {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
+  .year-item:hover { border-color: #00d4aa; background: rgba(0,212,170,0.04); }
+  .year-item .yi-year { display: flex; flex-direction: column; gap: 0.2rem; }
   .year-item .yi-number {
     color: #ffffff;
     font-size: 1.3rem;
     font-weight: 800;
     letter-spacing: -0.02em;
   }
-  .year-item .yi-count {
-    color: #7d8590;
-    font-size: 0.8rem;
-    font-weight: 500;
-  }
-  .year-item .yi-totals {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  }
-  .year-item .yi-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    text-align: right;
-  }
+  .year-item .yi-count { color: #7d8590; font-size: 0.8rem; font-weight: 500; }
+  .year-item .yi-totals { display: flex; gap: 1rem; align-items: center; }
+  .year-item .yi-stat { display: flex; flex-direction: column; gap: 0.15rem; text-align: right; }
   .year-item .yi-label {
     color: #7d8590;
     font-size: 0.65rem;
@@ -896,10 +895,7 @@
     letter-spacing: 0.8px;
     font-weight: 600;
   }
-  .year-item .yi-value {
-    font-size: 0.95rem;
-    font-weight: 700;
-  }
+  .year-item .yi-value { font-size: 0.95rem; font-weight: 700; }
   .year-item .yi-value.inc { color: #00d4aa; }
   .year-item .yi-value.exp { color: #ff5a5f; }
   .year-item .yi-value.bal {
@@ -913,12 +909,7 @@
     -webkit-background-clip: text;
     background-clip: text;
   }
-  .years-empty {
-    text-align: center;
-    color: #484f58;
-    font-style: italic;
-    padding: 2rem 0;
-  }
+  .years-empty { text-align: center; color: #484f58; font-style: italic; padding: 2rem 0; }
 
   .how-modal {
     max-width: 640px;
@@ -928,7 +919,6 @@
   }
   .how-modal::-webkit-scrollbar { width: 6px; }
   .how-modal::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
-
   .how-header {
     display: flex;
     justify-content: space-between;
@@ -938,7 +928,6 @@
     flex-wrap: wrap;
   }
   .how-header h3 { margin-bottom: 0; }
-
   .how-lang {
     display: flex;
     background: #0d1117;
@@ -961,7 +950,6 @@
   }
   .how-lang button.active { background: #30363d; color: #00d4aa; }
   .how-lang button:hover:not(.active) { color: #c9d1d9; }
-
   .how-body {
     margin-top: 1.2rem;
     color: #c9d1d9;
@@ -979,10 +967,7 @@
   }
   .how-body h4:first-child { margin-top: 0; }
   .how-body ul { list-style: none; padding-left: 0; }
-  .how-body li {
-    padding: 0.35rem 0 0.35rem 1.6rem;
-    position: relative;
-  }
+  .how-body li { padding: 0.35rem 0 0.35rem 1.6rem; position: relative; }
   .how-body li::before {
     content: '\f111';
     font-family: 'Font Awesome 6 Free';
@@ -1031,6 +1016,7 @@
     .year-stats { width: 100%; justify-content: space-around; }
     .year-divider { display: none; }
     .year-selector { font-size: 1.1rem; }
+    .year-nav button { width: 34px; height: 34px; }
   }
 </style>
 </head>
@@ -1078,12 +1064,15 @@
     <span><span class="dot"></span> <span id="autosaveStatus">Αυτόματη αποθήκευση</span></span>
   </div>
 
-  <!-- ΚΑΡΤΑ ΕΤΟΥΣ -->
   <div class="year-card">
     <div class="year-label">
       <span class="title"><i class="fas fa-calendar"></i> <span id="yearTitleLabel">Σύνολο Έτους</span></span>
       <div class="year-selector-row">
-        <select class="year-selector" id="yearSelect" onchange="changeYear()"></select>
+        <div class="year-nav">
+          <button id="btnPrevYear" onclick="prevYear()" title="Προηγούμενο έτος"><i class="fas fa-chevron-left"></i></button>
+          <select class="year-selector" id="yearSelect" onchange="changeYear()"></select>
+          <button id="btnNextYear" onclick="nextYear()" title="Επόμενο έτος"><i class="fas fa-chevron-right"></i></button>
+        </div>
         <button class="btn-all-years" onclick="openAllYearsModal()" id="btnAllYears">
           <i class="fas fa-list"></i>
           <span id="btnAllYearsText">Όλα τα έτη</span>
@@ -1316,6 +1305,8 @@
       today: 'Σήμερα:',
       prevMonth: 'Προηγούμενος μήνας',
       nextMonth: 'Επόμενος μήνας',
+      prevYear: 'Προηγούμενο έτος',
+      nextYear: 'Επόμενο έτος',
       currentMonthBtn: 'Τρέχων μήνας',
       incomeTitle: 'Έσοδα',
       expenseTitle: 'Έξοδα',
@@ -1352,6 +1343,7 @@
       restoreConfirm: 'Η επαναφορά θα ΑΝΤΙΚΑΤΑΣΤΗΣΕΙ όλα τα τρέχοντα δεδομένα σου. Συνέχεια;',
       confirmDelCat: 'Διαγραφή της κατηγορίας "{cat}";\n\nΟι υπάρχουσες εγγραφές με αυτή την κατηγορία δεν θα διαγραφούν, αλλά θα εμφανίζονται χωρίς μετάφραση.',
       cannotDelBuiltin: 'Δεν μπορείς να διαγράψεις τις προεπιλεγμένες κατηγορίες. Μόνο τις δικές σου.',
+      futureNotAllowed: 'Δεν μπορείς να πας σε μελλοντικό έτος ή μήνα.',
       months: ['Ιανουάριος','Φεβρουάριος','Μάρτιος','Απρίλιος','Μάιος','Ιούνιος',
                'Ιούλιος','Αύγουστος','Σεπτέμβριος','Οκτώβριος','Νοέμβριος','Δεκέμβριος'],
       docTitle: 'Έσοδα – Έξοδα',
@@ -1378,6 +1370,7 @@
           <li>Γράψε το <strong>ποσό</strong> σε ευρώ</li>
           <li>Πάτα <strong>+</strong> ή <code>Enter</code></li>
           <li>Η <strong>ημερομηνία μπαίνει αυτόματα</strong> με τη σημερινή μέρα</li>
+          <li>Δεν μπορείς να προσθέσεις σε μελλοντικά έτη</li>
         </ul>
 
         <h4><i class="fas fa-folder-plus"></i> Νέα κατηγορία</h4>
@@ -1395,8 +1388,11 @@
 
         <h4><i class="fas fa-calendar"></i> Επιλογή έτους</h4>
         <ul>
-          <li>Διάλεξε έτος από το <strong>dropdown</strong> στην κάρτα «Σύνολο Έτους»</li>
+          <li>Χρησιμοποίησε τα βελάκια <strong>◀ ▶</strong> δίπλα στο έτος</li>
+          <li>Ή διάλεξε έτος από το dropdown</li>
           <li>Όταν αλλάζεις έτος → πηγαίνει <strong>αυτόματα στον Ιανουάριο</strong></li>
+          <li>Όταν επιστρέφεις στο <strong>τρέχον έτος</strong> → πηγαίνει στον <strong>τρέχοντα μήνα</strong></li>
+          <li><strong>Δεν</strong> μπορείς να πας σε μελλοντικό έτος</li>
           <li>Πάτα <strong>Όλα τα έτη</strong> για να δεις ποια έτη έχουν δεδομένα</li>
         </ul>
 
@@ -1431,6 +1427,8 @@
       today: 'Today:',
       prevMonth: 'Previous month',
       nextMonth: 'Next month',
+      prevYear: 'Previous year',
+      nextYear: 'Next year',
       currentMonthBtn: 'Current month',
       incomeTitle: 'Income',
       expenseTitle: 'Expenses',
@@ -1467,6 +1465,7 @@
       restoreConfirm: 'Restore will OVERWRITE all current data. Continue?',
       confirmDelCat: 'Delete category "{cat}"?\n\nExisting records with this category won\'t be deleted, but will appear untranslated.',
       cannotDelBuiltin: 'You cannot delete built-in categories. Only your own.',
+      futureNotAllowed: 'You cannot go to a future year or month.',
       months: ['January','February','March','April','May','June',
                'July','August','September','October','November','December'],
       docTitle: 'Income – Expenses',
@@ -1493,6 +1492,7 @@
           <li>Type the <strong>amount</strong> in euros</li>
           <li>Press <strong>+</strong> or <code>Enter</code></li>
           <li>The <strong>date is added automatically</strong> with today's date</li>
+          <li>You cannot add to future years</li>
         </ul>
 
         <h4><i class="fas fa-folder-plus"></i> New category</h4>
@@ -1510,8 +1510,11 @@
 
         <h4><i class="fas fa-calendar"></i> Year selection</h4>
         <ul>
-          <li>Pick a year from the <strong>dropdown</strong> in the "Year Total" card</li>
+          <li>Use the <strong>◀ ▶</strong> arrows next to the year</li>
+          <li>Or pick a year from the dropdown</li>
           <li>When you change year → it goes <strong>automatically to January</strong></li>
+          <li>When you return to the <strong>current year</strong> → it goes to the <strong>current month</strong></li>
+          <li>You <strong>cannot</strong> go to a future year</li>
           <li>Click <strong>All years</strong> to see which years have data</li>
         </ul>
 
@@ -1541,9 +1544,6 @@
     }
   };
 
-  /* ============================================================
-     CATEGORIES
-     ============================================================ */
   const DEFAULT_CATEGORIES = {
     income: [
       { id: 'salary',      el: 'Μισθός',    en: 'Salary' },
@@ -1565,9 +1565,6 @@
 
   function getBuiltinIds(tp) { return DEFAULT_CATEGORIES[tp].map(c => c.id); }
 
-  /* ============================================================
-     STATE
-     ============================================================ */
   let lang = 'el';
   let howLang = 'el';
   let autosaveOn = false;
@@ -1619,13 +1616,8 @@
     return months()[parseInt(m,10)-1] + ' ' + y;
   }
 
-  /* ============================================================
-     ΚΑΤΗΓΟΡΙΕΣ
-     ============================================================ */
   function getCatLabel(id) {
-    if (customLabels[id]) {
-      return lang === 'el' ? customLabels[id].el : customLabels[id].en;
-    }
+    if (customLabels[id]) return lang === 'el' ? customLabels[id].el : customLabels[id].en;
     for (const tp of ['income','expense']) {
       const found = DEFAULT_CATEGORIES[tp].find(c => c.id === id);
       if (found) return lang === 'el' ? found.el : found.en;
@@ -1641,31 +1633,31 @@
   }
   function isBuiltin(tp, id) { return getBuiltinIds(tp).includes(id); }
 
-  /* ============================================================
-     SAVE / LOAD
-     ============================================================ */
   function save() {
-    localStorage.setItem('budgetDataV9', JSON.stringify(data));
-    localStorage.setItem('budgetCategoriesV9', JSON.stringify(categories));
-    localStorage.setItem('budgetCustomLabelsV9', JSON.stringify(customLabels));
-    localStorage.setItem('budgetLangV9', lang);
-    localStorage.setItem('budgetAutosaveV9', autosaveOn ? '1' : '0');
-    localStorage.setItem('budgetYearV9', currentYear);
+    localStorage.setItem('budgetDataV11', JSON.stringify(data));
+    localStorage.setItem('budgetCategoriesV11', JSON.stringify(categories));
+    localStorage.setItem('budgetCustomLabelsV11', JSON.stringify(customLabels));
+    localStorage.setItem('budgetLangV11', lang);
+    localStorage.setItem('budgetAutosaveV11', autosaveOn ? '1' : '0');
+    localStorage.setItem('budgetYearV11', currentYear);
   }
   function load() {
     try {
-      const d = JSON.parse(localStorage.getItem('budgetDataV9') || 'null');
+      const d = JSON.parse(localStorage.getItem('budgetDataV11') || 'null');
       if (d) data = d;
-      const c = JSON.parse(localStorage.getItem('budgetCategoriesV9') || 'null');
+      const c = JSON.parse(localStorage.getItem('budgetCategoriesV11') || 'null');
       if (c) categories = c;
-      const cl = JSON.parse(localStorage.getItem('budgetCustomLabelsV9') || 'null');
+      const cl = JSON.parse(localStorage.getItem('budgetCustomLabelsV11') || 'null');
       if (cl) customLabels = cl;
-      const l = localStorage.getItem('budgetLangV9');
+      const l = localStorage.getItem('budgetLangV11');
       if (l === 'el' || l === 'en') lang = l;
-      const a = localStorage.getItem('budgetAutosaveV9');
+      const a = localStorage.getItem('budgetAutosaveV11');
       autosaveOn = (a === '1');
-      const y = localStorage.getItem('budgetYearV9');
-      if (y && /^\d{4}$/.test(y)) currentYear = parseInt(y, 10);
+      const y = localStorage.getItem('budgetYearV11');
+      if (y && /^\d{4}$/.test(y)) {
+        const parsed = parseInt(y, 10);
+        currentYear = Math.min(parsed, currentYearReal());
+      }
     } catch(e) {}
     if (!categories.income || categories.income.length === 0)
       categories.income = DEFAULT_CATEGORIES.income.map(c => c.id);
@@ -1721,9 +1713,6 @@
     document.getElementById('autosaveToggle').classList.toggle('active', autosaveOn);
   }
 
-  /* ============================================================
-     ΓΛΩΣΣΑ
-     ============================================================ */
   function setLang(newLang) {
     if (lang === newLang) return;
     lang = newLang;
@@ -1791,8 +1780,11 @@
     document.getElementById('btnLangEn').classList.toggle('active', lang === 'en');
     document.getElementById('btnPrev').title = t('prevMonth');
     document.getElementById('btnNext').title = t('nextMonth');
+    document.getElementById('btnPrevYear').title = t('prevYear');
+    document.getElementById('btnNextYear').title = t('nextYear');
 
     updateDeleteCatButtons();
+    updateYearNavButtons();
   }
 
   function applyHowTranslations() {
@@ -1804,21 +1796,13 @@
     document.getElementById('howLangEn').classList.toggle('active', howLang === 'en');
   }
 
-  /* ============================================================
-     HOW MODAL
-     ============================================================ */
   function openHowModal() {
     howLang = lang;
     applyHowTranslations();
     document.getElementById('howModalBg').classList.add('active');
   }
-  function closeHowModal() {
-    document.getElementById('howModalBg').classList.remove('active');
-  }
+  function closeHowModal() { document.getElementById('howModalBg').classList.remove('active'); }
 
-  /* ============================================================
-     RESTORE MODAL
-     ============================================================ */
   function openRestoreModal() {
     pendingRestore = null;
     document.getElementById('restoreFileInput').value = '';
@@ -1832,17 +1816,13 @@
   }
   function handleRestoreFile(file) {
     if (!file) return;
-    if (!file.name.toLowerCase().endsWith('.json')) {
-      showNotice(t('restoreError'), 'err');
-      return;
-    }
+    if (!file.name.toLowerCase().endsWith('.json')) { showNotice(t('restoreError'), 'err'); return; }
     const reader = new FileReader();
     reader.onload = e => {
       try {
         const parsed = JSON.parse(e.target.result);
         if (!parsed.data || !Array.isArray(parsed.data.income) || !Array.isArray(parsed.data.expense)) {
-          showNotice(t('restoreNoData'), 'err');
-          return;
+          showNotice(t('restoreNoData'), 'err'); return;
         }
         pendingRestore = {
           data: parsed.data,
@@ -1854,15 +1834,12 @@
         document.getElementById('rpFileName').textContent = file.name;
         const dt = parsed.exportedAt ? new Date(parsed.exportedAt) : null;
         document.getElementById('rpDate').textContent = dt
-          ? dt.toLocaleString(lang === 'el' ? 'el-GR' : 'en-IE')
-          : '—';
+          ? dt.toLocaleString(lang === 'el' ? 'el-GR' : 'en-IE') : '—';
         document.getElementById('rpIncome').textContent = parsed.data.income.length;
         document.getElementById('rpExpense').textContent = parsed.data.expense.length;
         document.getElementById('restorePreview').classList.add('show');
         document.getElementById('btnRestoreConfirm').disabled = false;
-      } catch (err) {
-        showNotice(t('restoreError'), 'err');
-      }
+      } catch (err) { showNotice(t('restoreError'), 'err'); }
     };
     reader.readAsText(file);
   }
@@ -1900,9 +1877,6 @@
     if (autosaveOn) downloadBackup();
   }
 
-  /* ============================================================
-     ΚΑΤΗΓΟΡΙΕΣ OPTIONS
-     ============================================================ */
   function renderCategoryOptions() {
     ['income','expense'].forEach(tp => {
       const sel = document.getElementById(tp + 'Category');
@@ -1970,9 +1944,6 @@
     closeModal();
   }
 
-  /* ============================================================
-     ΕΤΗ
-     ============================================================ */
   function getYearsWithData() {
     const years = new Set();
     ['income','expense'].forEach(tp => {
@@ -1980,24 +1951,28 @@
         if (item.date) years.add(yearFromDate(item.date));
       });
     });
-    return Array.from(years).sort().reverse(); // νεότερα πρώτα
+    return Array.from(years).sort().reverse();
   }
 
   function getAllYearsForSelect() {
-    // Όλα τα έτη που έχουν δεδομένα + το τρέχον έτος
     const years = new Set(getYearsWithData());
     years.add(String(currentYearReal()));
-    return Array.from(years).sort().reverse();
+    years.add(String(currentYear));
+    const maxYear = currentYearReal();
+    return Array.from(years)
+      .filter(y => parseInt(y, 10) <= maxYear)
+      .sort()
+      .reverse();
   }
 
   function populateYearSelect() {
     const sel = document.getElementById('yearSelect');
     const years = getAllYearsForSelect();
+    const maxYear = currentYearReal();
 
-    // Αν το τρέχον currentYear δεν υπάρχει, βάλε το τρέχον πραγματικό
-    if (!years.includes(String(currentYear))) {
-      currentYear = currentYearReal();
-    }
+    if (currentYear > maxYear) currentYear = maxYear;
+    if (!years.includes(String(currentYear))) years.push(String(currentYear));
+    years.sort().reverse();
 
     sel.innerHTML = '';
     years.forEach(y => {
@@ -2007,21 +1982,70 @@
       if (parseInt(y,10) === currentYear) opt.selected = true;
       sel.appendChild(opt);
     });
+
+    updateYearNavButtons();
+  }
+
+  function updateYearNavButtons() {
+    const maxYear = currentYearReal();
+    const btnPrev = document.getElementById('btnPrevYear');
+    const btnNext = document.getElementById('btnNextYear');
+    if (btnPrev) btnPrev.disabled = currentYear <= 1900;
+    if (btnNext) btnNext.disabled = currentYear >= maxYear;
+  }
+
+  // Όταν αλλάζουμε έτος:
+  // - Αν πάμε στο τρέχον έτος → τρέχων μήνας
+  // - Αλλιώς → Ιανουάριος
+  function setMonthForYear() {
+    if (currentYear === currentYearReal()) {
+      currentMonth = currentMonthKeyReal();
+    } else {
+      currentMonth = currentYear + '-01';
+    }
   }
 
   function changeYear() {
     const sel = document.getElementById('yearSelect');
-    currentYear = parseInt(sel.value, 10);
-    // Πήγαινε στον Ιανουάριο του έτους
-    currentMonth = currentYear + '-01';
+    const newYear = parseInt(sel.value, 10);
+    const maxYear = currentYearReal();
+    if (newYear > maxYear) {
+      showNotice(t('futureNotAllowed'), 'warn');
+      sel.value = currentYear;
+      return;
+    }
+    currentYear = newYear;
+    setMonthForYear();
     save();
+    populateYearSelect();
     populateMonthSelect();
     render();
   }
 
-  /* ============================================================
-     ALL YEARS MODAL
-     ============================================================ */
+  function prevYear() {
+    if (currentYear <= 1900) return;
+    currentYear -= 1;
+    setMonthForYear();
+    save();
+    populateYearSelect();
+    populateMonthSelect();
+    render();
+  }
+
+  function nextYear() {
+    const maxYear = currentYearReal();
+    if (currentYear >= maxYear) {
+      showNotice(t('futureNotAllowed'), 'warn');
+      return;
+    }
+    currentYear += 1;
+    setMonthForYear();
+    save();
+    populateYearSelect();
+    populateMonthSelect();
+    render();
+  }
+
   function openAllYearsModal() {
     renderYearsList();
     document.getElementById('allYearsModalBg').classList.add('active');
@@ -2051,7 +2075,7 @@
       item.className = 'year-item';
       item.onclick = () => {
         currentYear = parseInt(y, 10);
-        currentMonth = currentYear + '-01';
+        setMonthForYear();
         save();
         populateYearSelect();
         populateMonthSelect();
@@ -2081,11 +2105,7 @@
     });
   }
 
-  /* ============================================================
-     ΜΗΝΕΣ
-     ============================================================ */
   function buildMonthList() {
-    // Πάντα 12 μήνες του τρέχοντος έτους (currentYear)
     const list = [];
     for (let m = 1; m <= 12; m++) {
       list.push(currentYear + '-' + String(m).padStart(2,'0'));
@@ -2096,11 +2116,9 @@
   function populateMonthSelect() {
     const sel = document.getElementById('monthSelect');
     const list = buildMonthList();
-
     if (!list.includes(currentMonth)) {
-      currentMonth = currentYear + '-01';
+      setMonthForYear();
     }
-
     sel.innerHTML = '';
     list.forEach(m => {
       const opt = document.createElement('option');
@@ -2113,13 +2131,30 @@
       if (m === currentMonth) opt.selected = true;
       sel.appendChild(opt);
     });
+    updateMonthNavButtons();
+  }
+
+  function updateMonthNavButtons() {
+    const [y, m] = currentMonth.split('-').map(Number);
+    const maxYear = currentYearReal();
+    const maxMonth = new Date().getMonth() + 1;
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    if (btnPrev) btnPrev.disabled = false;
+    if (btnNext) {
+      if (y > maxYear || (y === maxYear && m >= maxMonth)) {
+        btnNext.disabled = true;
+      } else {
+        btnNext.disabled = false;
+      }
+    }
   }
 
   function changeMonth() { currentMonth = document.getElementById('monthSelect').value; render(); }
   function prevMonth() {
     const [y, m] = currentMonth.split('-').map(Number);
     if (m === 1) {
-      // Πάμε στον Δεκέμβριο του προηγούμενου έτους
+      if (y <= 1900) return;
       currentYear = y - 1;
       currentMonth = currentYear + '-12';
       save();
@@ -2131,8 +2166,18 @@
     render();
   }
   function nextMonth() {
+    const maxYear = currentYearReal();
+    const maxMonth = new Date().getMonth() + 1;
     const [y, m] = currentMonth.split('-').map(Number);
+    if (y === maxYear && m >= maxMonth) {
+      showNotice(t('futureNotAllowed'), 'warn');
+      return;
+    }
     if (m === 12) {
+      if (y + 1 > maxYear) {
+        showNotice(t('futureNotAllowed'), 'warn');
+        return;
+      }
       currentYear = y + 1;
       currentMonth = currentYear + '-01';
       save();
@@ -2152,9 +2197,6 @@
     render();
   }
 
-  /* ============================================================
-     ΠΡΟΣΘΗΚΗ / ΔΙΑΓΡΑΦΗ
-     ============================================================ */
   function addItem(type) {
     const catEl    = document.getElementById(type + 'Category');
     const amountEl = document.getElementById(type + 'Amount');
@@ -2175,7 +2217,6 @@
       amount: amount,
       date: date
     });
-    // Πήγαινε στον τρέχοντα μήνα/έτος
     currentYear = currentYearReal();
     currentMonth = currentMonthKeyReal();
     amountEl.value = '';
@@ -2196,9 +2237,6 @@
     if (autosaveOn) downloadBackup();
   }
 
-  /* ============================================================
-     RENDER
-     ============================================================ */
   function render() {
     const incomes  = data.income.filter(i  => i.date && monthKeyFromDate(i.date) === currentMonth);
     const expenses = data.expense.filter(i => i.date && monthKeyFromDate(i.date) === currentMonth);
@@ -2218,10 +2256,10 @@
     document.getElementById('statExpense').textContent = formatNumber(tE);
     document.getElementById('statSave').textContent    = (tI > 0 ? (bal/tI*100) : 0).toFixed(1) + '%';
     renderYearTotals();
+    updateMonthNavButtons();
   }
 
   function renderYearTotals() {
-    document.getElementById('yearNumber') && (document.getElementById('yearNumber').textContent = currentYear);
     const yearPrefix = currentYear + '-';
     const yearIncomes  = data.income.filter(i  => i.date && i.date.startsWith(yearPrefix));
     const yearExpenses = data.expense.filter(i => i.date && i.date.startsWith(yearPrefix));
@@ -2279,9 +2317,6 @@
     }
   }
 
-  /* ============================================================
-     EVENTS
-     ============================================================ */
   ['income','expense'].forEach(tp => {
     document.getElementById(tp+'Amount').addEventListener('keydown', e => {
       if (e.key === 'Enter') addItem(tp);
@@ -2332,7 +2367,9 @@
      ΕΚΚΙΝΗΣΗ
      ============================================================ */
   load();
-  currentMonth = currentYear + '-01';
+  // ✅ Ξεκινάμε από τον τρέχοντα μήνα + τρέχον έτος
+  currentYear = currentYearReal();
+  currentMonth = currentMonthKeyReal();
   applyTranslations();
   updateAutosaveUI();
   renderCategoryOptions();
